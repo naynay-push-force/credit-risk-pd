@@ -1,0 +1,5 @@
+{
+  "python.defaultInterpreterPath": "C:\\dev\\credit-risk-pd\\.venv\\Scripts\\python.exe",
+  "python.terminal.activateEnvironment": true,
+  "jupyter.askForKernelRestart": false
+}
