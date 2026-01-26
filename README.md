@@ -12,7 +12,7 @@ Scope (current):
 
 ## Project Roadmap
 - Phase 0: Infrastructure & Environment (complete)
-- Phase 1: Data plumbing & preprocessing (current)
+- Phase 1: Data plumbing & preprocessing (complete)
 - Phase 2: Baseline modelling & evaluation
 - Phase 3: Credit-risk decision logic
 - Phase 4: Production maturity & deployment
@@ -42,4 +42,16 @@ Scope (current):
 ## Current Status
 - X/y separation implemented and validated
 - Default rate ≈ 8%, confirming class imbalance
-- Next step: feature typing (numeric vs categorical)
+- Phase 1 complete. Onto phase 2
+- Next step: build the baseline model pipeline
+
+## Phase 1 - Data Plumbing & Preprocessing (Complete)
+Implemented a leakage-safe preprocessing workflow with the following properties:
+
+- Explicit X / y separation
+- Feature typing (numeric vs categorical) based on dataset inspection
+- Stratified train/validation split
+- Missing value handling via sklearn pipelines consisting of imputation with median and mode
+- ColumnTransformer-based preprocessing for reuse at training and inference
+
+All preprocessing steps are fit on training data only and applied consistently to validation data.
