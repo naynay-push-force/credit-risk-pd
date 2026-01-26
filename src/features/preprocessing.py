@@ -4,7 +4,7 @@ from typing import Tuple, List
 def split_X_y(
         df: pd.DataFrame, 
         target_col: str = "TARGET"
-        ) -> Tuple[pd.DataFrame, pd.Series]:
+) -> Tuple[pd.DataFrame, pd.Series]:
     """
     Separates features and target.
     
@@ -38,3 +38,33 @@ def identify_feature_types(
     numeric_cols = X.select_dtypes(include=["number"]).columns.tolist()
     
     return numeric_cols, categorical_cols
+
+def impute_missing_simple(
+        X: pd.DataFrame,
+        numeric_cols: List[str],
+        categorical_cols: List[str]
+) -> pd.DataFrame:
+    """
+    Simple baseline imputation using pandas:
+    - numeric: fill with median
+    - categorical: fill with mode
+    
+    This is NOT the final imputation strategy (sklearn will do it later),
+    but it makes the idea concrete and testable."""
+    X_imp = X.copy()
+
+    # Impute numeric columns with median
+    for col in numeric_cols:
+        median = X_imp[col].median()
+        X_imp[col] = X_imp[col].fillna(median)
+
+    # Impute categorical columns with mode
+    for col in categorical_cols:
+        mode = X_imp[col].mode(dropna=True)
+        if len(mode) > 0:
+            fill_value = mode.iloc[0]
+        else:
+            fill_value = "Missing"
+        X_imp[col] = X_imp[col].fillna(fill_value)
+
+    return X_imp
