@@ -8,6 +8,7 @@ from src.features.preprocessing import (
     train_val_split,
     fit_imputers,
     apply_imputers,
+    build_preprocessor,
 )
 
 # Load data
@@ -39,14 +40,11 @@ before = X.isna().sum().sum()
 X_imp = impute_missing_simple(X, numeric_cols, categorical_cols)
 after = X_imp.isna().sum().sum()
 
-print(f"\nTotal missing values before imputation: {before}")
-print(f"Total missing values after imputation: {after}")
+print(f"\nTotal missing values before simple imputation: {before}")
+print(f"Total missing values after simple imputation: {after}")
 
 # Train-validation split test
 X_train, X_val, y_train, y_val = train_val_split(X, y)
-print(f"\nOverall default rate: {y.mean()}")
-print(f"Train default rate {y_train.mean()}")
-print(f"Validation default rate {y_val.mean()}")
 print(f"Train size: {X_train.shape}, Validation size: {X_val.shape}")
 
 # Fit and apply imputers test
@@ -61,9 +59,21 @@ X_val_imp = apply_imputers(X_val, numeric_cols, categorical_cols, num_imp, cat_i
 train_missing_after = pd.DataFrame(X_train_imp).isna().sum().sum()
 val_missing_after = pd.DataFrame(X_val_imp).isna().sum().sum()
 
-print("Train missing BEFORE:", train_missing_before)
-print("Train missing AFTER:", train_missing_after)
-print("Val missing BEFORE:", val_missing_before)
-print("Val missing AFTER:", val_missing_after)
+print("\nTrain missing BEFORE robust imputation:", train_missing_before)
+print("Train missing AFTER robust imputation:", train_missing_after)
+print("Val missing BEFORE robust imputation:", val_missing_before)
+print("Val missing AFTER robust imputation:", val_missing_after)
 
-print("Default rates - overall/train/val:", y.mean(), y_train.mean(), y_val.mean())
+# Build preprocessor test, fitting only on training data
+preprocessor = build_preprocessor(numeric_cols, categorical_cols)
+
+preprocessor.fit(X_train)
+
+Xt_train = preprocessor.transform(X_train)
+Xt_val = preprocessor.transform(X_val)
+
+print("\nTransformed train shape:", Xt_train.shape)
+print("Transformed val shape:", Xt_val.shape)
+
+# Check that default rates are preserved
+print("\nDefault rates - overall/train/val:", y.mean(), y_train.mean(), y_val.mean())

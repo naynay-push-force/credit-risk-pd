@@ -1,7 +1,12 @@
 import pandas as pd
 from typing import Tuple, List
+
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
 
 # 1. Split features and target
 def split_X_y(
@@ -126,3 +131,36 @@ def apply_imputers(
     X_out[categorical_cols] = cat_imputer.transform(X_out[categorical_cols])
 
     return X_out
+
+def build_preprocessor(
+    numeric_cols: List[str],
+    categorical_cols: List[str]
+) -> ColumnTransformer:
+    """
+    Build an sklearn ColumnTransformer that:
+    - Imputes & scales numeric features
+    - Imputes + one-hot encodes categorical features
+    
+    IMPORTANT:
+    - This function does not fit anything.
+    - Fitting happens on training data only: preprocessor.fit(X_train)
+    """
+    numeric_pipeline = Pipeline(steps=[
+        ("imputer", SimpleImputer(strategy="median")),
+        ("scaler", StandardScaler()),
+    ])
+
+    categorical_pipeline = Pipeline(steps=[
+        ("imputer", SimpleImputer(strategy="most_frequent")),
+        ("onehot", OneHotEncoder(handle_unknown="ignore")),
+    ])
+
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ("num", numeric_pipeline, numeric_cols),
+            ("cat", categorical_pipeline, categorical_cols),
+        ],
+        remainder="drop",
+    )
+
+    return preprocessor
