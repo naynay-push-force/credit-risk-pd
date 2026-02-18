@@ -7,7 +7,9 @@ def build_baseline_model(
     """
     Build a simple baseline PD model using logistic regression.
     
-    The pipeline """
+    The pipeline includes preprocessing + model so that:
+    - trainging and inference share the same transformations
+    - the entire system can be saved as on object later"""
 
     model = LogisticRegression(
         max_iter=1000,
