@@ -48,9 +48,11 @@ Implemented a leakage-safe preprocessing workflow with the following properties:
 - Missing value handling via sklearn pipelines consisting of imputation with median and mode
 - ColumnTransformer-based preprocessing for reuse at training and inference
 
-### Current Status
-- Default rate ≈ 8%, confirming class imbalance
-- Phase 1 complete. Onto phase 2
-- Next step: build the baseline model pipeline
-
 All preprocessing steps are fit on training data only and applied consistently to validation data.
+
+## Phase 2 - Feature Engineering & Baseline Modelling (In Progress)
+- Application-level features engineered with EDA justification (v1)
+- Baseline logistic regression pipeline implemented
+- Validation ROC AUC ≈ 0.75, KS ≈ [your value]
+
+Next: model evaluation report, calibration analysis
