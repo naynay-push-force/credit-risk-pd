@@ -3,14 +3,14 @@
 ## Objective 
 Build an end-to-end Probability of Default (PD) model using real-world consumer lending data, with an focus on correctness, reproducability, and professional ML practices. 
 
-## Dataset
+### Dataset
 Home Credit Default Risk (Kaggle)
 
 Scope (current):
 - Application-level data only (`application_train.csv`)
 - Behavioural tables deferred to later phases
 
-## Project Roadmap
+### Project Roadmap
 - Phase 0: Infrastructure & Environment (complete)
 - Phase 1: Data plumbing & preprocessing (complete)
 - Phase 2: Baseline modelling & evaluation
@@ -39,12 +39,6 @@ Scope (current):
 
 **Rationale:** Prevents data leakage and mirrors inference-time constraints.
 
-## Current Status
-- X/y separation implemented and validated
-- Default rate ≈ 8%, confirming class imbalance
-- Phase 1 complete. Onto phase 2
-- Next step: build the baseline model pipeline
-
 ## Phase 1 - Data Plumbing & Preprocessing (Complete)
 Implemented a leakage-safe preprocessing workflow with the following properties:
 
@@ -53,5 +47,10 @@ Implemented a leakage-safe preprocessing workflow with the following properties:
 - Stratified train/validation split
 - Missing value handling via sklearn pipelines consisting of imputation with median and mode
 - ColumnTransformer-based preprocessing for reuse at training and inference
+
+### Current Status
+- Default rate ≈ 8%, confirming class imbalance
+- Phase 1 complete. Onto phase 2
+- Next step: build the baseline model pipeline
 
 All preprocessing steps are fit on training data only and applied consistently to validation data.
