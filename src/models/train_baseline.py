@@ -3,6 +3,8 @@
 import pandas as pd
 from sklearn.metrics import roc_auc_score, average_precision_score
 
+from src.features.feature_engineering  import add_application_features
+
 from src.features.preprocessing import (
     split_X_y,
     identify_feature_types,
@@ -14,6 +16,8 @@ from src.models.baseline import build_baseline_model
 from src.models.metrics import ks_statistic
 
 df = pd.read_csv("data/raw/application_train.csv")
+
+df = add_application_features(df)
 
 # Data plumbing
 X, y = split_X_y(df)
