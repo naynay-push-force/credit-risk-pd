@@ -1,8 +1,9 @@
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
+from sklearn.compose import ColumnTransformer
 
 def build_baseline_model(
-        preprocessor
+        preprocessor: ColumnTransformer
 ) -> Pipeline:
     """
     Build a simple baseline PD model using logistic regression.
