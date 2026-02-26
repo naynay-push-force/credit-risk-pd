@@ -47,30 +47,30 @@ split (leakage-safe).
 
 ## Experiments
 
-| run_id | class_weight | calibration | AUC | PR-AUC | KS | KS_THREH | Notes |
-|---|---|---|---|---|---|---|
+| run_id | class_weight | calibration | AUC | PR-AUC | KS | KS_THRESH | Notes |
+|---|---|---|---|---|---|---|---|
 | 2026-02-26_13-33-55 | balanced | none | 0.7506 | 0.2320 | 0.370 | 0.5013 | Initial baseline |
 | 2025-02-25_15-10-45 | none | none | 0.7509 | 0.2355 | 0.3695 | 0.0827 | Removed balanced weights |
 | 2026-02-26_16-15-40 | balanced | platt | 0.7560 | 0.2360 | 0.3855 | 0.0805 | Restored balanced, added Platt scaling |
 
 ---
 
-## Evaluation — Best Configuration (run_id: TBD)
+## Evaluation — Best Configuration (run_id: 2026-02-26_16-15-40)
 
 ### Discrimination
 - **ROC AUC: 0.75** 
-    — a random classifer would do 0.50, assigning random scores to everyone
-    — respectable for application-only data. 
+    - a random classifer would do 0.50, assigning random scores to everyone
+    - respectable for application-only data. 
     Industry benchmark for application-only models is 0.68–0.75 
     without bureau data.
 - **KS: 0.37** 
-    — the model achieves maximum separation between 
+    - the model achieves maximum separation between 
     defaulter and non-defaulter score distributions at threshold ~0.5013
 - **PR-AUC: 0.23** 
-    — a random classifier would do 0.08, accusing some proportion of the 
+    - a random classifier would do 0.08, accusing some proportion of the 
     population of being defaulters for some random threshold. 
     Among which, on average, 0.08 would actually be defaulters.
-    — approximately 3x better than a random 
+    - approximately 3x better than a random 
     classifier (random baseline = default rate = 0.08).
 
 ### Gains
