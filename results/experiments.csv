@@ -3,3 +3,4 @@ run_id,version,class_weight,calibration,auc,pr_auc,ks,ks_thresh,notes
 "
 2026-02-26_13-33-55,v1,balanced,none,0.750576,0.231983,0.371783,0.501339,run 2: same as run 1; added ks_thresh column to tracking
 2026-02-26_15-07-33,v1,none,none,0.750935,0.235502,0.369471,0.082656,run 3: same as run 1; removed balanced weights
+2026-02-26_16-15-40,v1,balanced,platt,0.759546,0.236007,0.385496,0.080457,run 4: same as run 1; applied platt scaling
