@@ -7,6 +7,7 @@ from typing import Tuple
 
 from sklearn.metrics import roc_auc_score, average_precision_score
 from sklearn.pipeline import Pipeline
+from sklearn.calibration import CalibratedClassifierCV
 
 from src.features.feature_engineering  import add_application_features
 
@@ -45,15 +46,11 @@ def train_and_predict(
 
     X, y = split_X_y(df)
 
-    # Drop redundant columns
+    # Apply config
     if FEATURE_CONFIG["drop_cols"]:
         X = X.drop(columns=FEATURE_CONFIG["drop_cols"])
-    
-    # Apply keep_cols (overrides everything else)
     if FEATURE_CONFIG["keep_cols"]:
         X = X[FEATURE_CONFIG["keep_cols"]]
-
-    # Apply force_categorical
     for col in FEATURE_CONFIG["force_categorical"]:
         X = X[col].astype("object")
 
@@ -61,12 +58,21 @@ def train_and_predict(
     numeric_cols, categorical_cols = identify_feature_types(X)
     X_train, X_val, y_train, y_val = train_val_split(X, y)
 
-    # Preprocessing + model
+    # Preprocessing, model + train
     preprocessor = build_preprocessor(numeric_cols, categorical_cols)
     pipeline = build_baseline_model(preprocessor)
-
-    # Train
     pipeline.fit(X_train, y_train)
+
+    # Apply platt scaling
+    calibration = FEATURE_CONFIG.get("calibration", "none")
+    if calibration == "platt":
+        pipeline = CalibratedClassifierCV(
+            pipeline,
+            method="sigmoid",   # sigmoid = Platt scaling
+            cv=None,         # pipeline already fitted, just learn the mapping
+        )
+        pipeline.fit(X_val, y_val)
+
     y_val_pred = pipeline.predict_proba(X_val)[:, 1]
 
     return pipeline, X_val, y_val, y_val_pred

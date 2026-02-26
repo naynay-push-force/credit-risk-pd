@@ -21,6 +21,7 @@ from src.models.evaluate import (
 )
 from src.models.train_baseline import train_and_predict
 
+from sklearn.calibration import CalibratedClassifierCV
 
 def main() -> None:
     run_id = dt.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -58,12 +59,18 @@ def main() -> None:
     # Score distributions
     score_distribution_plot(y_val, y_val_pred, paths.figures / "score_distribution.png")
 
+    # Extract the first fold's fitted pipeline to allow for feature name extraction
+    if isinstance(model, CalibratedClassifierCV):
+        base_pipeline = model.calibrated_classifiers_[0].estimator
+    else:
+        base_pipeline = model
+
     # Feature names + coefficients
     # Extract feature names from the fitted preprocessor
-    pre = model.named_steps["preprocessor"]
+    pre = base_pipeline.named_steps["preprocessor"]
     feature_names = pre.get_feature_names_out().tolist()
     logistic_coefficients_table(
-        model,
+        base_pipeline,
         feature_names,
         outpath=paths.tables / "top_coefficients.csv",
         top_k=40,
