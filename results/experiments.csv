@@ -1,0 +1,2 @@
+run_id,version,class_weight,calibration,auc,pr_auc,ks,notes
+2026-02-26_10-43-36,v1,balanced,none,0.750576,0.231983,0.371783,"base ratios, age, employment, missingness flags"
