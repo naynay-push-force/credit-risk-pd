@@ -5,3 +5,4 @@ run_id,version,class_weight,calibration,auc,pr_auc,ks,ks_thresh,notes
 2026-02-26_15-07-33,v1,none,none,0.750935,0.235502,0.369471,0.082656,run 3: same as run 1; removed balanced weights
 2026-02-26_16-15-40,v1,balanced,platt,0.759546,0.236007,0.385496,0.080457,run 4: same as run 1; applied platt scaling
 2026-02-26_19-26-17,v2,balanced,platt,0.759544,0.23588,0.386178,0.080486,run 5: same as run 1; dropped DAYS_BIRTH and DAYS_EMPLOYED
+2026-02-26_20-37-47,v3,balanced,platt,0.761212,0.238273,0.389642,0.076916,"run 6: same as run 5 (v2); log transforms for amount features: INCOME, CREDIT, GOODS_PRICE, ANNUITY"

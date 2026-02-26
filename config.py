@@ -13,10 +13,10 @@ Version increment policy:
 """
 
 FEATURE_CONFIG = {
-    "version": "v2",
+    "version": "v3",
     "class_weight": "balanced",
     "calibration": "platt",
-    "notes": "run 5: same as run 1; dropped DAYS_BIRTH and DAYS_EMPLOYED",
+    "notes": "run 6: same as run 5 (v2); log transforms for amount features: INCOME, CREDIT, GOODS_PRICE, ANNUITY",
 
     # Redundancy / multicolinearity management
     "drop_cols": ["DAYS_BIRTH", "DAYS_EMPLOYED"],
