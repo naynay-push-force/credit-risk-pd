@@ -68,4 +68,12 @@ def add_application_features(
         if col in df.columns:
             df[f"{col}_MISSING"] = df[col].isna().astype(int)
 
+    ## -- Log transforms for skewed amount features --
+    # Amount features are heavily right-skewed 
+    # Logarithms measure relative percentage changes, not absolute changes
+    # Financial risk scales by percentages/multipliers
+    for col in ["AMT_INCOME_TOTAL", "AMT_ANNUITY", "AMT_CREDIT", "AMT_GOODS_PRICE"]:
+        if col in df.columns:
+            df[f"LOG_{col}"] = np.log1p(df[col])
+
     return df
