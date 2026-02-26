@@ -13,13 +13,13 @@ Version increment policy:
 """
 
 FEATURE_CONFIG = {
-    "version": "v1",
-    "class_weight": "None",
-    "calibration": "none",
-    "notes": "base ratios; age; employment; missingness flags; added ks_thresh column",
+    "version": "v2",
+    "class_weight": "balanced",
+    "calibration": "platt",
+    "notes": "run 5: same as run 1; dropped DAYS_BIRTH and DAYS_EMPLOYED",
 
     # Redundancy / multicolinearity management
-    "drop_cols": [],
+    "drop_cols": ["DAYS_BIRTH", "DAYS_EMPLOYED"],
     "keep_cols": [],    # if non-empty, only these columns will be kept
 
     "force_categorical": [],
