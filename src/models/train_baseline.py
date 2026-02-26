@@ -1,5 +1,7 @@
 # python -m src.models.train_baseline
 
+from config import FEATURE_CONFIG
+
 import pandas as pd
 from typing import Tuple
 
@@ -41,8 +43,21 @@ def train_and_predict(
     int_cols = df.select_dtypes(include="int64").columns
     df[int_cols] = df[int_cols].astype("int32")
 
-    # Data plumbing
     X, y = split_X_y(df)
+
+    # Drop redundant columns
+    if FEATURE_CONFIG["drop_cols"]:
+        X = X.drop(columns=FEATURE_CONFIG["drop_cols"])
+    
+    # Apply keep_cols (overrides everything else)
+    if FEATURE_CONFIG["keep_cols"]:
+        X = X[FEATURE_CONFIG["keep_cols"]]
+
+    # Apply force_categorical
+    for col in FEATURE_CONFIG["force_categorical"]:
+        X = X[col].astype("object")
+
+    # Data plumbing
     numeric_cols, categorical_cols = identify_feature_types(X)
     X_train, X_val, y_train, y_val = train_val_split(X, y)
 
