@@ -34,7 +34,7 @@ def main() -> None:
     # Curves
     auc = plot_roc(y_val, y_val_pred, paths.figures / "roc_curve.png")
     pr_auc = plot_pr(y_val, y_val_pred, paths.figures / "pr_curve.png")
-    ks, _ = ks_statistic(y_val, y_val_pred)
+    ks, ks_thresh = ks_statistic(y_val, y_val_pred)
 
     # Calibration + reliability table
     calibration_report(
@@ -76,7 +76,7 @@ def main() -> None:
 
     with open(exp_path, mode="a", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=[
-            "run_id", "version", "class_weight", "calibration", "auc", "pr_auc", "ks", "notes"
+            "run_id", "version", "class_weight", "calibration", "auc", "pr_auc", "ks", "ks_thresh", "notes"
         ])
         if write_header:
             writer.writeheader() # write header only if file is new
@@ -88,11 +88,12 @@ def main() -> None:
             "auc": round(auc, 6),
             "pr_auc": round(pr_auc, 6),
             "ks": round(ks, 6),
+            "ks_thresh": round(ks_thresh, 6),
             "notes": FEATURE_CONFIG["notes"],
         })
     
     print(f"Run {run_id} complete. Saved evaluation artifacts to {paths.root.resolve()}")
-    print(f"AUC: {auc:.6f} | PR-AUC: {pr_auc:.6f} | KS: {ks:.6f}")
+    print(f"AUC: {auc:.6f} | PR-AUC: {pr_auc:.6f} | KS: {ks:.6f} | KS_THRESH: {ks_thresh:.6f}")
 
 if __name__ == "__main__":
     main()
