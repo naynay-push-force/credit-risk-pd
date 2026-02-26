@@ -50,9 +50,30 @@ Implemented a leakage-safe preprocessing workflow with the following properties:
 
 All preprocessing steps are fit on training data only and applied consistently to validation data.
 
-## Phase 2 - Feature Engineering & Baseline Modelling (In Progress)
-- Application-level features engineered with EDA justification (v1)
-- Baseline logistic regression pipeline implemented
-- Validation ROC AUC ≈ 0.75, KS ≈ [your value]
+## Phase 2 - Feature Engineering & Baseline Modelling 
 
-Next: model evaluation report, calibration analysis
+### What was built
+- Leakage-safe baseline logistic regression PD model trained on application-level features
+- Feature engineering module with EDA-justified ratios, age/employment transforms, 
+  and missingness indicators
+- Full evaluation pipeline producing ROC, PR, calibration, gains, and coefficient artifacts
+- Automated experiment tracking via results/experiments.csv and versioned reports folders
+- Platt scaling applied to correct probability inflation from balanced class weighting
+
+### Results (v1, balanced weights + Platt scaling)
+- Validation ROC AUC: 0.7595
+- Validation KS: 0.3855
+- PR-AUC: 0.2360
+- Top decile captures 33% of defaults; top two deciles capture 51%
+- Calibration curve sits on diagonal across full operating range
+
+### Key decisions
+- class_weight='balanced' retained for score spread and threshold flexibility
+- Platt scaling (cv=5) applied post-hoc to restore probability interpretability
+- See docs/model_card_v1.md for full experiment record and evaluation narrative
+
+## Phase 3 - Feature Refinement & Threshold Analysis (In Progress)
+- Remove redundant source columns where engineered versions exist (multicolinearity)
+- Investigate log transforms for skewed amount features such as loan info
+- Threshold analysis: approval rate vs default capture rate vs expected loss
+
