@@ -14,9 +14,9 @@ Version increment policy:
 
 FEATURE_CONFIG = {
     "version": "v1",
-    "class_weight": "balanced",
+    "class_weight": "None",
     "calibration": "none",
-    "notes": "base ratios, age, employment, missingness flags",
+    "notes": "base ratios; age; employment; missingness flags; added ks_thresh column",
 
     # Redundancy / multicolinearity management
     "drop_cols": [],

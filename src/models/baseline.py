@@ -2,6 +2,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.compose import ColumnTransformer
 
+from config import FEATURE_CONFIG
+
 def build_baseline_model(
         preprocessor: ColumnTransformer
 ) -> Pipeline:
@@ -12,9 +14,15 @@ def build_baseline_model(
     - trainging and inference share the same transformations
     - the entire system can be saved as on object later"""
 
+    # Safely get the value from config
+    cw_config = FEATURE_CONFIG.get("class_weight", "balanced")
+
+    if type(cw_config) == str and cw_config.lower() == "none":
+        cw_config = None
+ 
     model = LogisticRegression(
         max_iter=1000,
-        class_weight="balanced",
+        class_weight=cw_config,
         solver="lbfgs",
     )
 
