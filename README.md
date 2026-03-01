@@ -36,7 +36,10 @@ approved portfolio bad rate of 4.3% vs population rate of 8.0%.
 
 Full evaluation: docs/model_card.md
 
+### ROC Curve
 ![ROC Curve](results/2026-02-26_20-37-47_v3/figures/roc_curve.png)
+
+### Threshold Plot
 ![Threshold Plot](results/threshold_analysis.png)
 
 ---
