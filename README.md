@@ -1,5 +1,7 @@
 # Credit Risk  PD Modelling - Home Credit
 
+--- 
+
 ## Objective 
 Build an end-to-end Probability of Default (PD) model using real-world consumer lending data, with an focus on correctness, reproducability, and professional ML practices. 
 
@@ -16,6 +18,8 @@ Scope (current):
 - Phase 2: Baseline modelling & evaluation
 - Phase 3: Credit-risk decision logic
 - Phase 4: Production maturity & deployment
+
+---
 
 ## Key Design Decisions (So Far)
 
@@ -39,6 +43,8 @@ Scope (current):
 
 **Rationale:** Prevents data leakage and mirrors inference-time constraints.
 
+---
+
 ## Phase 1 - Data Plumbing & Preprocessing (Complete)
 Implemented a leakage-safe preprocessing workflow with the following properties:
 
@@ -49,6 +55,8 @@ Implemented a leakage-safe preprocessing workflow with the following properties:
 - ColumnTransformer-based preprocessing for reuse at training and inference
 
 All preprocessing steps are fit on training data only and applied consistently to validation data.
+
+---
 
 ## Phase 2 - Feature Engineering & Baseline Modelling 
 
@@ -72,8 +80,32 @@ All preprocessing steps are fit on training data only and applied consistently t
 - Platt scaling (cv=5) applied post-hoc to restore probability interpretability
 - See docs/model_card_v1.md for full experiment record and evaluation narrative
 
-## Phase 3 - Feature Refinement & Threshold Analysis (In Progress)
-- Remove redundant source columns where engineered versions exist (multicolinearity)
-- Investigate log transforms for skewed amount features such as loan info
-- Threshold analysis: approval rate vs default capture rate vs expected loss
+---
 
+## Phase 3 - Threshold Analysis & Decision Layer (Complete)
+
+- Evaluated model across thresholds 0.02–0.27
+- Recommended operating range: 0.10–0.12 predicted PD
+- At threshold 0.10: 73.5% approval rate, 60.8% default capture, 
+  4.3% approved portfolio bad rate vs 8.0% population rate
+- Expected loss analysis conducted assuming 100% LGD (worst case)
+- Beyond threshold 0.12, cost per approval point nearly doubles — 
+  diminishing returns on risk-adjusted portfolio growth
+
+## Current State
+
+V1 complete. Application-level PD model with:
+- Leakage-safe preprocessing pipeline
+- EDA-justified feature engineering (ratios, transforms, missingness flags)
+- Calibrated probability outputs via Platt scaling
+- Full evaluation suite (ROC, PR, calibration, gains, coefficients)
+- Experiment tracking across feature versions
+- Threshold analysis with business interpretation
+
+ROC AUC: 0.761 | KS: 0.390 | PR-AUC: 0.238
+
+## Phase 4 - Planned
+- Bureau and behavioural data integration
+- WoE/IV feature analysis
+- Interaction terms
+- Stress testing across subgroups
