@@ -143,7 +143,36 @@ ratio. AUC improved from 0.7595 to 0.7612, KS from 0.3855 to
 
 ---
 
+## Threshold Analysis
+
+Full analysis: notebooks/03_threshold_analysis.ipynb
+
+The model was evaluated across thresholds from 0.02 to 0.27. 
+The recommended operating range is 0.10–0.12 predicted PD.
+
+At threshold 0.10:
+- Approval rate: 73.5%
+- Default capture rate: 60.8%
+- Bad rate (approved portfolio): 4.3% vs population rate of 8.0%
+- Expected loss per 1000 applicants: ~25.8M (assumes 100% LGD)
+
+Beyond threshold 0.12, the cost per additional percentage point 
+of approval rate rises from 450k to 864k in expected loss. 
+Namely, nearly double. This makes further loosening inefficient. 
+Tightening below 0.10 yields diminishing default capture returns 
+relative to approval rate sacrificed.
+
+This analysis was meant to layout the trade-off between approving
+more loans and capturing more defaults. It's intended as a framework,
+not as a final decision. In a production environment, the threshold 
+selection process would likely involve a number of constraints such
+as available capital and regulatory rules. 
+
+--- 
+
 ## Next Steps
-- Threshold analysis: approval rate vs default capture rate vs 
-  expected loss simulation
 - Interaction terms as a candidate for v4
+- Further feature engineering on the basis of domain knowledge
+  and giving categorical feature more attention
+- Further EDA
+- Inclusion of Beareau dataset
