@@ -16,7 +16,7 @@ def split_X_y(
     """
     Separates features and target.
     
-    This function defines the boundary between:
+    This function isolates the following:
     - data we can observe at inference time (X)
     - the outcome we are trying to predict (y)
     """
@@ -33,7 +33,7 @@ def identify_feature_types(
         X: pd.DataFrame
 ) -> Tuple[List[str], List[str]]:
     """
-    Identify categorical and numerical feature columns.
+    Identifies categorical and numerical feature columns.
     
     Numeric features:
     - int, float
@@ -58,8 +58,10 @@ def impute_missing_simple(
     - numeric: fill with median
     - categorical: fill with mode
     
-    This is NOT the final imputation strategy (sklearn will do it later),
-    but it makes the idea concrete and testable."""
+    This isn't the final imputation strategy. That
+    is done with sklearn. Using this as a learning
+    tool.
+    """
     X_imp = X.copy()
 
     # Impute numeric columns with median
@@ -122,7 +124,7 @@ def apply_imputers(
     cat_imputer: SimpleImputer
 ) -> pd.DataFrame:
     """
-    Apply fitted imputers to any dataframe (tran/val/test).
+    Applies fitted imputers to any dataframe (tran/val/test).
     Returns a DataFrame with the same columns as X.
     """
     X_out = X.copy()
@@ -132,16 +134,17 @@ def apply_imputers(
 
     return X_out
 
+# 6. ColumnTransformer implementation
 def build_preprocessor(
     numeric_cols: List[str],
     categorical_cols: List[str]
 ) -> ColumnTransformer:
     """
-    Build an sklearn ColumnTransformer that:
+    Builds an sklearn ColumnTransformer that:
     - Imputes & scales numeric features
     - Imputes + one-hot encodes categorical features
     
-    IMPORTANT:
+    Note:
     - This function does not fit anything.
     - Fitting happens on training data only: preprocessor.fit(X_train)
     """
