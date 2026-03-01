@@ -7,8 +7,9 @@ Build an end-to-end Probability of Default (PD) model using real-world consumer 
 is on correct ML system design, leakage discipline, and credit-specific evaluation.
 with a focus on correctness, reproducability, and professional ML practices. 
 
-**Current status:** C1 complete (application-level) data
-**ROC AUC: 0.761 | KS: 0.390 | PR-AUC: 0.238**
+**Current status:** V1 complete (application-level) data
+
+**ROC AUC:** 0.761 | **KS:** 0.390 | **PR-AUC:** 0.238
 
 ### Dataset
 Home Credit Default Risk ([Kaggle](https://www.kaggle.com/competitions/home-credit-default-risk/overview_))
@@ -22,6 +23,10 @@ Scope (current):
 ---
 
 ## Results
+
+**Model:** Logistic Regression with Platt scaling 
+(sklearn Pipeline: median imputation -> StandardScaler -> 
+OneHotEncoder, class_weight='balanced')
 
 | Metric | Value |
 |---|---|
@@ -75,8 +80,9 @@ results/
 
 ## Key Design Decisions
 
-**Leakage prevention:** All preprocessing fit on training data only. 
-Target separated before any transformation.
+**Leakage prevention:** When preprocessing, transformers were made to
+fit on training data only, and then transform both the training and 
+testing sets. Target separated before any transformation.
 
 **Calibration:** class_weight='balanced' retained for score spread. 
 Following this, Platt scaling was then applied to restore probability 
