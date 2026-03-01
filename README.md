@@ -3,109 +3,95 @@
 --- 
 
 ## Objective 
-Build an end-to-end Probability of Default (PD) model using real-world consumer lending data, with an focus on correctness, reproducability, and professional ML practices. 
+Build an end-to-end Probability of Default (PD) model using real-world consumer lending data. The focus 
+is on correct ML system design, leakage discipline, and credit-specific evaluation.
+with a focus on correctness, reproducability, and professional ML practices. 
+
+**Current status:** C1 complete (application-level) data
+**ROC AUC: 0.761 | KS: 0.390 | PR-AUC: 0.238**
 
 ### Dataset
-Home Credit Default Risk (Kaggle)
+Home Credit Default Risk ([Kaggle](https://www.kaggle.com/competitions/home-credit-default-risk/overview_))
 
 Scope (current):
 - Application-level data only (`application_train.csv`)
-- Behavioural tables deferred to later phases
-
-### Project Roadmap
-- Phase 0: Infrastructure & Environment (complete)
-- Phase 1: Data plumbing & preprocessing (complete)
-- Phase 2: Baseline modelling & evaluation
-- Phase 3: Credit-risk decision logic
-- Phase 4: Production maturity & deployment
+- 307,511 loan applications
+- 8% default rate (class imbalance confirmed)
+- Behavioural tables deferred to later phase 4
 
 ---
 
-## Key Design Decisions (So Far)
+## Results
 
-### Environment Isolation
-- Project-local virtual environment (`.venv`)
-- Python 3.12 pinned for stability
-- All dependencies installed explicitly
+| Metric | Value |
+|---|---|
+| ROC AUC | 0.761 |
+| KS Statistic | 0.390 |
+| PR-AUC | 0.238 |
+| Top decile default capture | 33% |
+| Top two deciles default capture | 51% |
 
-**Rationale:** Prevents hidden global dependencies and ensures reproducibility.
+At threshold 0.10: 73.5% approval rate, 60.8% default capture, 
+approved portfolio bad rate of 4.3% vs population rate of 8.0%.
 
-### Git Strategy
-- Git introduced after environment stabilisation
-- Commits represent coherent engineering decisions
-- Data and environment artifacts excluded via `.gitignore`
+Full evaluation: docs/model_card.md
 
-**Rationale:** Git history doubles as a design log.
-
-### Data Boundary Definition
-- Target (`TARGET`) explicitly separated from features
-- All preprocessing operates on features only
-
-**Rationale:** Prevents data leakage and mirrors inference-time constraints.
+![ROC Curve](reports/2026-02-26_20-37-47_v3/figures/roc_curve.png)
+![Threshold Plot](reports/threshold_analysis.png)
 
 ---
 
-## Phase 1 - Data Plumbing & Preprocessing (Complete)
-Implemented a leakage-safe preprocessing workflow with the following properties:
+## Repository Structure 
 
-- Explicit X / y separation
-- Feature typing (numeric vs categorical) based on dataset inspection
-- Stratified train/validation split
-- Missing value handling via sklearn pipelines consisting of imputation with median and mode
-- ColumnTransformer-based preprocessing for reuse at training and inference
+```
+src/
+    features/
+        feature_engineering.py   # domain-justified feature transforms
+        preprocessing.py         # leakage-safe preprocessing pipeline
+    models/
+        baseline.py              # logistic regression pipeline
+        evaluate.py              # evaluation functions
+        metrics.py               # KS statistic
+        run_evaluation.py        # produces report artifacts
+        train_baseline.py        # training entry point
+    config.py                    # feature version and experiment config
 
-All preprocessing steps are fit on training data only and applied consistently to validation data.
+notebooks/
+    01_eda_application_train.ipynb
+    02_baseline_evaluation.ipynb
+    03_threshold_analysis.ipynb
 
----
+docs/
+    model_card.md                # full experiment record and findings
 
-## Phase 2 - Feature Engineering & Baseline Modelling 
-
-### What was built
-- Leakage-safe baseline logistic regression PD model trained on application-level features
-- Feature engineering module with EDA-justified ratios, age/employment transforms, 
-  and missingness indicators
-- Full evaluation pipeline producing ROC, PR, calibration, gains, and coefficient artifacts
-- Automated experiment tracking via results/experiments.csv and versioned reports folders
-- Platt scaling applied to correct probability inflation from balanced class weighting
-
-### Results (v1, balanced weights + Platt scaling)
-- Validation ROC AUC: 0.7595
-- Validation KS: 0.3855
-- PR-AUC: 0.2360
-- Top decile captures 33% of defaults; top two deciles capture 51%
-- Calibration curve sits on diagonal across full operating range
-
-### Key decisions
-- class_weight='balanced' retained for score spread and threshold flexibility
-- Platt scaling (cv=5) applied post-hoc to restore probability interpretability
-- See docs/model_card_v1.md for full experiment record and evaluation narrative
+results/
+    experiments.csv              # tracked experiment log
+```
 
 ---
 
-## Phase 3 - Threshold Analysis & Decision Layer (Complete)
+## Key Design Decisions
 
-- Evaluated model across thresholds 0.02–0.27
-- Recommended operating range: 0.10–0.12 predicted PD
-- At threshold 0.10: 73.5% approval rate, 60.8% default capture, 
-  4.3% approved portfolio bad rate vs 8.0% population rate
-- Expected loss analysis conducted assuming 100% LGD (worst case)
-- Beyond threshold 0.12, cost per approval point nearly doubles — 
-  diminishing returns on risk-adjusted portfolio growth
+**Leakage prevention:** All preprocessing fit on training data only. 
+Target separated before any transformation.
 
-## Current State
+**Calibration:** class_weight='balanced' retained for score spread. 
+Following this, Platt scaling was then applied to restore probability 
+interpretability. A model predicting PD=0.10 should default 
+roughly 10% of the time — uncalibrated it would not.
 
-V1 complete. Application-level PD model with:
-- Leakage-safe preprocessing pipeline
-- EDA-justified feature engineering (ratios, transforms, missingness flags)
-- Calibrated probability outputs via Platt scaling
-- Full evaluation suite (ROC, PR, calibration, gains, coefficients)
-- Experiment tracking across feature versions
-- Threshold analysis with business interpretation
+**Experiment tracking:** Each feature version and hyperparameter 
+change is logged in results/experiments.csv with versioned 
+artifact folders. Config-driven pipeline means any experiment 
+is reproducible from a single config change.
 
-ROC AUC: 0.761 | KS: 0.390 | PR-AUC: 0.238
+---
 
-## Phase 4 - Planned
-- Bureau and behavioural data integration
-- WoE/IV feature analysis
-- Interaction terms
-- Stress testing across subgroups
+## Project Roadmap
+- Phase 0: Environment and repository structure
+- Phase 1: Leakage-safe preprocessing pipeline 
+- Phase 2: Feature egineering, baseline model, evaluation
+- Phase 3: Threshold analysis
+- Phase 4: Bureau and behavioural data integration,
+            WOE/IV analysis, stress testing 
+
