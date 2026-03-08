@@ -12,7 +12,7 @@ with a focus on correctness, reproducability, and professional ML practices.
 **ROC AUC:** 0.761 | **KS:** 0.390 | **PR-AUC:** 0.238
 
 ### Dataset
-Home Credit Default Risk ([Kaggle](https://www.kaggle.com/competitions/home-credit-default-risk/overview_))
+Home Credit Default Risk ([Kaggle](https://www.kaggle.com/competitions/home-credit-default-risk/overview))
 
 Scope (current):
 - Application-level data only (`application_train.csv`)
@@ -24,9 +24,13 @@ Scope (current):
 
 ## Results
 
-**Model:** Logistic Regression with Platt scaling 
-(sklearn Pipeline: median imputation -> StandardScaler -> 
-OneHotEncoder, class_weight='balanced')
+**Model:** 
+- Logistic Regression with Platt scaling 
+    - sklearn Pipeline: 
+        - median imputation,
+        - StandardScaler,
+        - OneHotEncoder, 
+        - class_weight='balanced'
 
 | Metric | Value |
 |---|---|
@@ -80,19 +84,24 @@ results/
 
 ## Key Design Decisions
 
-**Leakage prevention:** When preprocessing, transformers were made to
-fit on training data only, and then transform both the training and 
-testing sets. Target separated before any transformation.
+**Leakage prevention:** 
+- Transformers were made fit on training data only
+- Target variable `TARGET` was separated before any transformation.
 
-**Calibration:** class_weight='balanced' retained for score spread. 
-Following this, Platt scaling was then applied to restore probability 
-interpretability. A model predicting PD=0.10 should default 
-roughly 10% of the time — uncalibrated it would not.
+**Calibration:** 
+- `class_weight='balanced'` was retained for score spread. 
+- Platt scaling was then applied to restore probability 
+interpretability, 
+    - i.e., a model predicting PD=0.10 should default 
+    roughly 10% of the time. 
+    - Otherwise, uncalibrated, it would not.
 
-**Experiment tracking:** Each feature version and hyperparameter 
-change is logged in results/experiments.csv with versioned 
-artifact folders. Config-driven pipeline means any experiment 
-is reproducible from a single config change.
+**Experiment tracking:** 
+- Each feature version and hyperparameter change is logged in 
+results/experiments.csv with versioned 
+artifact folders. 
+- Config-driven pipeline means any experiment is reproducible 
+from a single config change.
 
 ---
 
