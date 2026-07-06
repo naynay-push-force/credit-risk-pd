@@ -27,11 +27,17 @@ def train_and_predict(
     """
     Train baseline pipeline and return what evaluation needs.
 
+    Split discipline:
+        - One stratified train/test split. The TEST set is touched exactly once,
+          at the end, for the reported metrics.
+        - Calibration (Platt) is fit on the TRAIN set only, via internal CV folds
+          (CalibratedClassifierCV(cv=5)) -- so no row is both fit-on and reported-on.
+
     Returns:
-        - pipeline: fitted sklearn Pipeline (preprocessor + logistic regression)
-        - X_val: validation features (raw, before preprocessing)
-        - y_val: validation labels
-        - y_val_pred: predicted probabilities for class 1 on validation set
+        - model:       fitted estimator (pipeline, optionally calibration-wrapped)
+        - X_test:      held-out test features (raw, before preprocessing)
+        - y_test:      held-out test labels
+        - y_test_pred: predicted PD (class-1 probabilities) on the test set
     """
 
     df = pd.read_csv(data_path)
@@ -46,7 +52,7 @@ def train_and_predict(
 
     X, y = split_X_y(df)
 
-    # Apply config
+    # Apply config (section B refactor candidate)
     if FEATURE_CONFIG["drop_cols"]:
         X = X.drop(columns=FEATURE_CONFIG["drop_cols"])
     if FEATURE_CONFIG["keep_cols"]:
@@ -56,41 +62,31 @@ def train_and_predict(
 
     # Data plumbing
     numeric_cols, categorical_cols = identify_feature_types(X)
-    X_train, X_val, y_train, y_val = train_val_split(X, y)
+    X_train, X_test, y_train, y_test = train_val_split(X, y)
 
     # Preprocessing, model + train
     preprocessor = build_preprocessor(numeric_cols, categorical_cols)
-    pipeline = build_baseline_model(preprocessor)
-    pipeline.fit(X_train, y_train)
+    model = build_baseline_model(preprocessor)
+    model.fit(X_train, y_train)
 
-    # Apply platt scaling
-    calibration = FEATURE_CONFIG.get("calibration", "none")
-    if calibration == "platt":
-        pipeline = CalibratedClassifierCV(
-            pipeline,
-            method="sigmoid",   # sigmoid = Platt scaling
-            cv=None,         # pipeline already fitted, just learn the mapping
-        )
-        pipeline.fit(X_val, y_val)
+    y_test_pred = model.predict_proba(X_test)[:, 1]
 
-    y_val_pred = pipeline.predict_proba(X_val)[:, 1]
-
-    return pipeline, X_val, y_val, y_val_pred
+    return model, X_test, y_test, y_test_pred
 
 
 # Evaluate
 def main() -> None:
-    pipeline, X_val, y_val, y_val_pred = train_and_predict()
+    model, X_test, y_test, y_test_pred = train_and_predict()
     
-    roc_auc = roc_auc_score(y_val, y_val_pred)
-    pr_auc = average_precision_score(y_val, y_val_pred)
-    ks, ks_threshold = ks_statistic(y_val, y_val_pred)
+    roc_auc = roc_auc_score(y_test, y_test_pred)
+    pr_auc = average_precision_score(y_test, y_test_pred)
+    ks, ks_threshold = ks_statistic(y_test, y_test_pred)
 
-    print("Validation ROC AUC:", roc_auc)
-    print("Validation PR-AUC:", pr_auc)
-    print("Validation KS:", ks)
+    print("Test ROC AUC:", roc_auc)
+    print("Test PR-AUC:", pr_auc)
+    print("Test KS:", ks)
     print("KS Threshold:", ks_threshold)
-    print("Sanity check", y_val_pred.min(), y_val_pred.max(), y_val_pred.mean())
+    print("Sanity check", y_test_pred.min(), y_test_pred.max(), y_test_pred.mean())
 
 if __name__ == "__main__":
     main()

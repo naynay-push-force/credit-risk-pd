@@ -1,12 +1,14 @@
+from sklearn.base import BaseEstimator
+from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
-from sklearn.compose import ColumnTransformer
+from sklearn.calibration import CalibratedClassifierCV
 
 from config import FEATURE_CONFIG
 
 def build_baseline_model(
         preprocessor: ColumnTransformer
-) -> Pipeline:
+) -> BaseEstimator:
     """
     Build a simple baseline PD model using logistic regression.
     
@@ -31,4 +33,8 @@ def build_baseline_model(
         ("model", model),
     ])
 
+    # Wrap in Platt calibration if configured
+    if FEATURE_CONFIG.get("calibration", "none") == "platt":
+        return CalibratedClassifierCV(pipeline, method='sigmoid', cv=5)
+    
     return pipeline
