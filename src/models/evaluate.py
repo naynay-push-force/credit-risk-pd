@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import StratifiedKFold, cross_validate
 from sklearn.calibration import calibration_curve
 from sklearn.metrics import (
     roc_curve,
@@ -41,7 +43,25 @@ class EvalPaths:
 def _to_numpy(x) -> np.ndarray:
     return np.asarray(x)
 
+# Stratified K-Fold Cross-validation
+def run_cv(model: Pipeline,
+           X_train: np.ndarray,
+           y_train: np.ndarray,
+           n_splits: int = 5,
+           random_state: int = 42,
+) -> dict:
+    skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
 
+    scoring = ["roc_auc", "average_precision"]
+    cv = cross_validate(estimator=model, X=X_train, y=y_train, cv=skf, scoring=scoring)
+
+    return {
+        "roc_auc_mean": cv["test_roc_auc"].mean(),
+        "roc_auc_std":  cv["test_roc_auc"].std(),
+        "pr_auc_mean":  cv["test_average_precision"].mean(),
+        "pr_auc_std":   cv["test_average_precision"].std(),
+    }
+    
 # Plot ROC curve
 def plot_roc(y_true, y_score, 
         outpath: Path,

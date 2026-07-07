@@ -6,12 +6,11 @@ from pathlib import Path
 import datetime as dt
 import csv
 
-import numpy as np
-
 from src.models.metrics import ks_statistic
 
 from src.models.evaluate import (
     EvalPaths,
+    run_cv,
     plot_roc,
     plot_pr,
     calibration_report,
@@ -29,18 +28,24 @@ def main() -> None:
     paths = EvalPaths(Path(f"reports/{run_id}_{FEATURE_CONFIG["version"]}"))
     paths.ensure()
 
-    # Train model + get predictions (val)
-    model, X_val, y_val, y_val_pred = train_and_predict()
+    # Train model + get predictions
+    model, X_train, X_test, y_train, y_test, y_test_pred = train_and_predict()
+
+    # Stratified k-fold validation
+    results = run_cv(model=model, X_train=X_train, y_train=y_train)
+
+    print(f"CV ROC AUC: {results['roc_auc_mean']:.6f} +/- {results['roc_auc_std']:.6f}")
+    print(f"CV PR-AUC:  {results['pr_auc_mean']:.6f} +/- {results['pr_auc_std']:.6f}")
 
     # Curves
-    auc = plot_roc(y_val, y_val_pred, paths.figures / "roc_curve.png")
-    pr_auc = plot_pr(y_val, y_val_pred, paths.figures / "pr_curve.png")
-    ks, ks_thresh = ks_statistic(y_val, y_val_pred)
+    auc = plot_roc(y_test, y_test_pred, paths.figures / "roc_curve.png")
+    pr_auc = plot_pr(y_test, y_test_pred, paths.figures / "pr_curve.png")
+    ks, ks_thresh = ks_statistic(y_test, y_test_pred)
 
     # Calibration + reliability table
     calibration_report(
-        y_val,
-        y_val_pred,
+        y_test,
+        y_test_pred,
         n_bins=10,
         strategy="quantile",
         outpath_fig=paths.figures / "calibration_curve.png",
@@ -49,15 +54,15 @@ def main() -> None:
 
     # Gains/lift
     gains_lift_table(
-        y_val,
-        y_val_pred,
+        y_test,
+        y_test_pred,
         n_bins=10,
         outpath_table=paths.tables / "gains_lift_table.csv",
         outpath_fig=paths.figures / "gains_curve.png",
     )
 
     # Score distributions
-    score_distribution_plot(y_val, y_val_pred, paths.figures / "score_distribution.png")
+    score_distribution_plot(y_test, y_test_pred, paths.figures / "score_distribution.png")
 
     # Extract the first fold's fitted pipeline to allow for feature name extraction
     if isinstance(model, CalibratedClassifierCV):

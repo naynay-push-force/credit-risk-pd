@@ -23,7 +23,7 @@ from src.models.metrics import ks_statistic
 
 def train_and_predict(
         data_path: str = "data/raw/application_train.csv"
-) -> Tuple[Pipeline, pd.DataFrame, pd.Series, pd.Series]:
+) -> Tuple[Pipeline, pd.DataFrame, pd.DataFrame, pd.Series, pd.Series, pd.Series]:
     """
     Train baseline pipeline and return what evaluation needs.
 
@@ -71,12 +71,12 @@ def train_and_predict(
 
     y_test_pred = model.predict_proba(X_test)[:, 1]
 
-    return model, X_test, y_test, y_test_pred
+    return model, X_train, X_test, y_train, y_test, y_test_pred
 
 
 # Evaluate
 def main() -> None:
-    model, X_test, y_test, y_test_pred = train_and_predict()
+    model, X_train, X_test, y_train, y_test, y_test_pred = train_and_predict()
     
     roc_auc = roc_auc_score(y_test, y_test_pred)
     pr_auc = average_precision_score(y_test, y_test_pred)
