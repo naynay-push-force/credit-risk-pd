@@ -35,7 +35,9 @@ def train_and_predict(
 
     Returns:
         - model:       fitted estimator (pipeline, optionally calibration-wrapped)
+        - X_train:     training features that feed run_cv() from evaluation.py
         - X_test:      held-out test features (raw, before preprocessing)
+        - y_train:     training labels that feed run_cv() from evaluation.py
         - y_test:      held-out test labels
         - y_test_pred: predicted PD (class-1 probabilities) on the test set
     """
