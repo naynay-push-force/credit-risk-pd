@@ -137,7 +137,7 @@ def apply_imputers(
 # 6. ColumnTransformer implementation
 def build_preprocessor(
     numeric_cols: List[str],
-    categorical_cols: List[str]
+    categorical_cols: List[str],
 ) -> ColumnTransformer:
     """
     Builds an sklearn ColumnTransformer that:
