@@ -24,6 +24,7 @@ from src.models.pipeline import (
     make_splits,
     build_pipeline,
     train,
+    persist,
 )
 from src.features.feature_engineering import add_application_features
 from src.features.preprocessing import identify_feature_types
@@ -53,8 +54,9 @@ def main() -> None:
     print(f"CV ROC AUC: {results['roc_auc_mean']:.6f} +/- {results['roc_auc_std']:.6f}")
     print(f"CV PR-AUC:  {results['pr_auc_mean']:.6f} +/- {results['pr_auc_std']:.6f}")
 
-    # Train and predict
+    # Train, persist, and predict
     model = train(model, X_train, y_train, FEATURE_CONFIG)
+    persist(model, paths.root / "model.joblib")
     y_test_pred = model.predict_proba(X_test)[:, 1]
 
     # Curves

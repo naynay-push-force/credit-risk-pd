@@ -13,6 +13,8 @@ from src.features.preprocessing import (
     )
 from src.models.baseline import build_baseline_model
 
+import joblib
+
 def load_data(path: Path) -> pd.DataFrame:
     return pd.read_csv(path)
 
@@ -52,3 +54,9 @@ def train(estimator: Pipeline,
     model.fit(X_train, y_train)
 
     return model
+
+def persist(model: BaseEstimator,
+            path: Path,
+) -> None:
+    joblib.dump(model, path)
+    
