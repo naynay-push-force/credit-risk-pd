@@ -43,12 +43,6 @@ def main() -> None:
     df = load_data(data_path)
 
     df = add_application_features(df)
-
-    # Downcast numeric columns to reduce memory pressure during imputation
-    float_cols = df.select_dtypes(include="float64").columns
-    df[float_cols] = df[float_cols].astype("float32")
-    int_cols = df.select_dtypes(include="int64").columns
-    df[int_cols] = df[int_cols].astype("int32")
     
     X_train, X_test, y_train, y_test = make_splits(df, FEATURE_CONFIG)
     numeric_cols, categorical_cols = identify_feature_types(X_train)
