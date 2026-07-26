@@ -10,19 +10,19 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 # 1. Split features and target
 def split_X_y(
-        df: pd.DataFrame, 
+        df: pd.DataFrame,
         target_col: str = "TARGET"
 ) -> Tuple[pd.DataFrame, pd.Series]:
     """
     Separates features and target.
-    
+
     This function isolates the following:
     - data we can observe at inference time (X)
     - the outcome we are trying to predict (y)
     """
     if target_col not in df.columns:
         raise ValueError(f"Target column '{target_col}' not found")
-    
+
     y = df[target_col].astype(int)
     X = df.drop(columns=[target_col])
 
@@ -34,53 +34,20 @@ def identify_feature_types(
 ) -> Tuple[List[str], List[str]]:
     """
     Identifies categorical and numerical feature columns.
-    
+
     Numeric features:
     - int, float
-    
+
     Categorical features:
     - object, category
     """
     categorical_cols = X.select_dtypes(include=["object", "category"]).columns.tolist()
 
     numeric_cols = X.select_dtypes(include=["number"]).columns.tolist()
-    
+
     return numeric_cols, categorical_cols
 
-# 3. Simple imputation
-def impute_missing_simple(
-        X: pd.DataFrame,
-        numeric_cols: List[str],
-        categorical_cols: List[str]
-) -> pd.DataFrame:
-    """
-    Simple baseline imputation using pandas:
-    - numeric: fill with median
-    - categorical: fill with mode
-    
-    This isn't the final imputation strategy. That
-    is done with sklearn. Using this as a learning
-    tool.
-    """
-    X_imp = X.copy()
-
-    # Impute numeric columns with median
-    for col in numeric_cols:
-        median = X_imp[col].median()
-        X_imp[col] = X_imp[col].fillna(median)
-
-    # Impute categorical columns with mode
-    for col in categorical_cols:
-        mode = X_imp[col].mode(dropna=True)
-        if len(mode) > 0:
-            fill_value = mode.iloc[0]
-        else:
-            fill_value = "Missing"
-        X_imp[col] = X_imp[col].fillna(fill_value)
-
-    return X_imp
-
-# 4. Train-validation split
+# 3. Train-validation split
 def train_val_split(
         X: pd.DataFrame,
         y: pd.Series,
@@ -98,43 +65,7 @@ def train_val_split(
     )
     return X_train, X_val, y_train, y_val
 
-# 5. Fitting and applying imputers separately
-def fit_imputers(
-        X_train: pd.DataFrame,
-        numeric_cols: List[str],
-        categorical_cols: List[str]
-) -> Tuple[SimpleImputer, SimpleImputer]:
-    """
-    Fit imputers on training data only.
-    Returns fitted numeric and categorical imputers.
-    """
-    num_imputer = SimpleImputer(strategy="median")
-    cat_imputer = SimpleImputer(strategy="most_frequent")
-
-    num_imputer.fit(X_train[numeric_cols])
-    cat_imputer.fit(X_train[categorical_cols])
-
-    return num_imputer, cat_imputer
-
-def apply_imputers(
-    X: pd.DataFrame,
-    numeric_cols: List[str],
-    categorical_cols: List[str],
-    num_imputer: SimpleImputer,
-    cat_imputer: SimpleImputer
-) -> pd.DataFrame:
-    """
-    Applies fitted imputers to any dataframe (tran/val/test).
-    Returns a DataFrame with the same columns as X.
-    """
-    X_out = X.copy()
-
-    X_out[numeric_cols] = num_imputer.transform(X_out[numeric_cols])
-    X_out[categorical_cols] = cat_imputer.transform(X_out[categorical_cols])
-
-    return X_out
-
-# 6. ColumnTransformer implementation
+# 4. ColumnTransformer implementation
 def build_preprocessor(
     numeric_cols: List[str],
     categorical_cols: List[str],
@@ -143,7 +74,7 @@ def build_preprocessor(
     Builds an sklearn ColumnTransformer that:
     - Imputes & scales numeric features
     - Imputes + one-hot encodes categorical features
-    
+
     Note:
     - This function does not fit anything.
     - Fitting happens on training data only: preprocessor.fit(X_train)
@@ -167,3 +98,42 @@ def build_preprocessor(
     )
 
     return preprocessor
+
+
+def main() -> None:
+    """
+    Smoke check for the live preprocessing path: split -> type -> fit/transform.
+
+    Run directly (`python -m src.features.preprocessing`) to confirm the module
+    still behaves; the asserts fail loudly if a step regresses.
+    """
+    df = pd.read_csv("data/raw/application_train.csv")
+
+    X, y = split_X_y(df)
+    numeric_cols, categorical_cols = identify_feature_types(X)
+    assert len(numeric_cols) + len(categorical_cols) == X.shape[1], "feature typing dropped columns"
+    print(f"Features: {X.shape[1]} ({len(numeric_cols)} numeric, {len(categorical_cols)} categorical)")
+
+    X_train, X_val, y_train, y_val = train_val_split(X, y)
+    assert X_train.shape[0] + X_val.shape[0] == X.shape[0], "split lost rows"
+    print(f"Split:    train {X_train.shape[0]:,}  val {X_val.shape[0]:,}")
+
+    # Fit on train only, then transform both -- the ColumnTransformer is the live path.
+    preprocessor = build_preprocessor(numeric_cols, categorical_cols)
+    preprocessor.fit(X_train)
+    Xt_train = preprocessor.transform(X_train)
+    Xt_val = preprocessor.transform(X_val)
+    assert Xt_train.shape[0] == X_train.shape[0], "transform changed the row count"
+    assert Xt_train.shape[1] == Xt_val.shape[1], "train/val feature widths differ"
+    print(f"Encoded:  {Xt_train.shape[1]} features (train {Xt_train.shape[0]:,} / val {Xt_val.shape[0]:,} rows)")
+
+    # A stratified split should keep the default rate stable across train/val.
+    assert abs(y_train.mean() - y.mean()) < 0.01, "train default rate drifted"
+    assert abs(y_val.mean() - y.mean()) < 0.01, "val default rate drifted"
+    print(f"Default rate: overall {y.mean():.4f}  train {y_train.mean():.4f}  val {y_val.mean():.4f}")
+
+    print("OK -- preprocessing smoke check passed.")
+
+
+if __name__ == "__main__":
+    main()

@@ -77,3 +77,38 @@ def add_application_features(
             df[f"LOG_{col}"] = np.log1p(df[col])
 
     return df
+
+
+def main() -> None:
+    """
+    Smoke check for feature engineering: confirm the expected engineered
+    columns are added and the missingness flags are strictly 0/1.
+
+    Run with `python -m src.features.feature_engineering`.
+    """
+    df = pd.read_csv("data/raw/application_train.csv")
+    before = df.shape[1]
+    out = add_application_features(df)
+
+    expected = [
+        "YEARS_BIRTH", "YEARS_EMPLOYED", "DAYS_EMPLOYED_MISSING",
+        "CREDIT_INCOME_RATIO", "ANNUITY_INCOME_RATIO", "GOODS_CREDIT_RATIO",
+        "EXT_SOURCE_1_MISSING", "EXT_SOURCE_3_MISSING",
+        "LOG_AMT_INCOME_TOTAL", "LOG_AMT_ANNUITY", "LOG_AMT_CREDIT", "LOG_AMT_GOODS_PRICE",
+    ]
+    missing = [c for c in expected if c not in out.columns]
+    assert not missing, f"missing engineered columns: {missing}"
+    assert out.shape[0] == df.shape[0], "row count changed"
+    print(f"Added {out.shape[1] - before} engineered columns -> {out.shape[1]} total.")
+
+    # Missingness flags are treated as signal, so they must be strictly 0/1.
+    flags = ["EXT_SOURCE_1_MISSING", "EXT_SOURCE_3_MISSING", "DAYS_EMPLOYED_MISSING"]
+    for flag in flags:
+        assert out[flag].isin([0, 1]).all(), f"{flag} is not 0/1"
+    print(f"Missingness flags all 0/1: {flags}")
+
+    print("OK -- feature engineering smoke check passed.")
+
+
+if __name__ == "__main__":
+    main()
