@@ -1,5 +1,7 @@
 from typing import Dict, Tuple, List
 
+from config import RunConfig
+
 import pandas as pd
 from pathlib import Path
 from sklearn.base import BaseEstimator
@@ -19,15 +21,15 @@ def load_data(path: Path) -> pd.DataFrame:
     return pd.read_csv(path)
 
 def make_splits(df: pd.DataFrame,
-                cfg: Dict,
+                cfg: RunConfig,
 )-> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     X, y = split_X_y(df)
 
     # Apply config (section B refactor candidate)
-    if cfg["drop_cols"]:
-        X = X.drop(columns=cfg["drop_cols"])
-    if cfg["keep_cols"]:
-        X = X[cfg["keep_cols"]]
+    if cfg.drop_cols:
+        X = X.drop(columns=cfg.drop_cols)
+    if cfg.keep_cols:
+        X = X[cfg.keep_cols]
 
     X_train, X_test, y_train, y_test = train_val_split(X, y)
 
@@ -35,20 +37,21 @@ def make_splits(df: pd.DataFrame,
 
 def build_pipeline(numeric_cols: List[str],
                    categorical_cols: List[str],
+                   cfg: RunConfig,
 ) -> Pipeline:
     # Preprocessing, model + train
     preprocessor = build_preprocessor(numeric_cols, categorical_cols)
-    model = build_baseline_model(preprocessor)
+    model = build_baseline_model(preprocessor, cfg)
     return model
 
 def train(estimator: Pipeline,
           X_train: pd.DataFrame,
           y_train: pd.Series,
-          cfg: Dict,
+          cfg: RunConfig,
 ) -> BaseEstimator:
     model = estimator
 
-    if cfg.get("calibration", "none") == "platt":
+    if cfg.calibration == "platt":
         model = CalibratedClassifierCV(estimator, method='sigmoid', cv=5)
 
     model.fit(X_train, y_train)

@@ -2,10 +2,11 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 
-from config import FEATURE_CONFIG
+from config import RunConfig
 
 def build_baseline_model(
-        preprocessor: ColumnTransformer
+        preprocessor: ColumnTransformer,
+        cfg: RunConfig,
 ) -> Pipeline:
     """
     Build a simple baseline PD model using logistic regression.
@@ -15,9 +16,9 @@ def build_baseline_model(
     - the entire system can be saved as on object later"""
 
     # Safely get the value from config
-    cw_config = FEATURE_CONFIG.get("class_weight", "balanced")
+    cw_config = cfg.class_weight
 
-    if type(cw_config) == str and cw_config.lower() == "none":
+    if cw_config.lower() == "none":
         cw_config = None
  
     model = LogisticRegression(

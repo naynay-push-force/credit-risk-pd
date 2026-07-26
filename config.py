@@ -11,17 +11,13 @@ Version increment policy:
 
 # Note: this is a lightweight alternative to tools like MLflow or W&B.
 """
+from dataclasses import dataclass, field
 
-FEATURE_CONFIG = {
-    "version": "v3",
-    "class_weight": "balanced",
-    "calibration": "platt",
-    "notes": "run 6: same as run 5 (v2); log transforms for amount features: INCOME, CREDIT, GOODS_PRICE, ANNUITY",
-
-    # Redundancy / multicolinearity management
-    "drop_cols": ["DAYS_BIRTH", "DAYS_EMPLOYED"],
-    "keep_cols": [],    # if non-empty, only these columns will be kept
-
-    "force_categorical": [],
-}
-
+@dataclass
+class RunConfig:
+    class_weight: str = "balanced"
+    calibration: str = "platt"
+    drop_cols: list[str] = field(default_factory=lambda: ["DAYS_BIRTH", "DAYS_EMPLOYED"])
+    keep_cols: list[str] = field(default_factory=list)
+    version: str = "v3" # optional human tag; the git SHA is the real identity
+    notes: str = "run 6: same as run 5 (v2); log transforms for amount features: INCOME, CREDIT, GOODS_PRICE, ANNUITY"

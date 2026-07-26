@@ -1,6 +1,6 @@
 # python -m src.models.run_evaluation
 
-from config import FEATURE_CONFIG
+from config import RunConfig
 
 from pathlib import Path
 import datetime as dt
@@ -34,9 +34,11 @@ from sklearn.calibration import CalibratedClassifierCV
 def main() -> None:
     start_time = time.perf_counter()
 
+    cfg = RunConfig()
+
     run_id = dt.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-    paths = EvalPaths(Path(f"reports/{run_id}_{FEATURE_CONFIG["version"]}"))
+    paths = EvalPaths(Path(f"reports/{run_id}_{cfg.version}"))
     paths.ensure()
 
     ROOT = Path(__file__).resolve().parent.parent.parent
@@ -45,9 +47,9 @@ def main() -> None:
 
     df = add_application_features(df)
     
-    X_train, X_test, y_train, y_test = make_splits(df, FEATURE_CONFIG)
+    X_train, X_test, y_train, y_test = make_splits(df, cfg)
     numeric_cols, categorical_cols = identify_feature_types(X_train)
-    model = build_pipeline(numeric_cols, categorical_cols)
+    model = build_pipeline(numeric_cols, categorical_cols, cfg)
 
     # Stratified k-fold validation
     results = run_cv(model=model, X_train=X_train, y_train=y_train)
@@ -55,7 +57,7 @@ def main() -> None:
     print(f"CV PR-AUC:  {results['pr_auc_mean']:.6f} +/- {results['pr_auc_std']:.6f}")
 
     # Train, persist, and predict
-    model = train(model, X_train, y_train, FEATURE_CONFIG)
+    model = train(model, X_train, y_train, cfg)
     persist(model, paths.root / "model.joblib")
     y_test_pred = model.predict_proba(X_test)[:, 1]
 
@@ -116,14 +118,14 @@ def main() -> None:
             writer.writeheader() # write header only if file is new
         writer.writerow({
             "run_id": run_id,
-            "version": FEATURE_CONFIG["version"],
-            "class_weight": FEATURE_CONFIG.get("class_weight", "balanced"),
-            "calibration": FEATURE_CONFIG.get("calibration", "none"),
+            "version": cfg.version,
+            "class_weight": cfg.class_weight,
+            "calibration": cfg.calibration,
             "auc": round(auc, 6),
             "pr_auc": round(pr_auc, 6),
             "ks": round(ks, 6),
             "ks_thresh": round(ks_thresh, 6),
-            "notes": FEATURE_CONFIG["notes"],
+            "notes": cfg.notes,
         })
     
     print(f"Run {run_id} complete. Saved evaluation artifacts to {paths.root.resolve()}")
