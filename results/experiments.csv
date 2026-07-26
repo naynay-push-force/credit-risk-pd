@@ -1,8 +1,17 @@
-run_id,version,class_weight,calibration,auc,pr_auc,ks,ks_thresh,notes
-2026-02-26_10-43-36,v1,balanced,none,0.750576,0.231983,0.371783,N/A,"run 1: base ratios; age; employment; missingness flags
-"
-2026-02-26_13-33-55,v1,balanced,none,0.750576,0.231983,0.371783,0.501339,run 2: same as run 1; added ks_thresh column to tracking
-2026-02-26_15-07-33,v1,none,none,0.750935,0.235502,0.369471,0.082656,run 3: same as run 1; removed balanced weights
-2026-02-26_16-15-40,v1,balanced,platt,0.759546,0.236007,0.385496,0.080457,run 4: same as run 1; applied platt scaling
-2026-02-26_19-26-17,v2,balanced,platt,0.759544,0.23588,0.386178,0.080486,run 5: same as run 1; dropped DAYS_BIRTH and DAYS_EMPLOYED
-2026-02-26_20-37-47,v3,balanced,platt,0.761212,0.238273,0.389642,0.076916,"run 6: same as run 5 (v2); log transforms for amount features: INCOME, CREDIT, GOODS_PRICE, ANNUITY"
+run_id,version,class_weight,calibration,auc,pr_auc,ks,ks_thresh,notes,data_regime
+2026-02-26_10-43-36,v1,balanced,none,0.750576,0.231983,0.371783,,"run 1: base ratios; age; employment; missingness flags
+",validation_only
+2026-02-26_13-33-55,v1,balanced,none,0.750576,0.231983,0.371783,0.501339,run 2: same as run 1; added ks_thresh column to tracking,validation_only
+2026-02-26_15-07-33,v1,none,none,0.750935,0.235502,0.369471,0.082656,run 3: same as run 1; removed balanced weights,validation_only
+2026-02-26_16-15-40,v1,balanced,platt,0.759546,0.236007,0.385496,0.080457,run 4: same as run 1; applied platt scaling,validation_only
+2026-02-26_19-26-17,v2,balanced,platt,0.759544,0.23588,0.386178,0.080486,run 5: same as run 1; dropped DAYS_BIRTH and DAYS_EMPLOYED,validation_only
+2026-02-26_20-37-47,v3,balanced,platt,0.761212,0.238273,0.389642,0.076916,"run 6: same as run 5 (v2); log transforms for amount features: INCOME, CREDIT, GOODS_PRICE, ANNUITY",validation_only
+2026-07-02_17-05-20,v3,balanced,platt,0.761212,0.238273,0.389642,0.076916,"run 6: same as run 5 (v2); log transforms for amount features: INCOME, CREDIT, GOODS_PRICE, ANNUITY",validation_only
+2026-07-07_15-15-27,v3,balanced,platt,0.75215,0.234875,0.373258,0.07888,"run 6: same as run 5 (v2); log transforms for amount features: INCOME, CREDIT, GOODS_PRICE, ANNUITY",heldout_test
+2026-07-25_13-45-41,v3,balanced,platt,0.75213,0.234893,0.372845,0.081981,"run 6: same as run 5 (v2); log transforms for amount features: INCOME, CREDIT, GOODS_PRICE, ANNUITY",heldout_test
+2026-07-25_13-57-13,v3,balanced,platt,0.75215,0.234875,0.373258,0.07888,"run 6: same as run 5 (v2); log transforms for amount features: INCOME, CREDIT, GOODS_PRICE, ANNUITY",heldout_test
+2026-07-25_14-44-10,v3,balanced,platt,0.75213,0.234893,0.372845,0.081981,"run 6: same as run 5 (v2); log transforms for amount features: INCOME, CREDIT, GOODS_PRICE, ANNUITY",heldout_test
+2026-07-25_22-59-39,v3,balanced,platt,0.75213,0.234893,0.372845,0.081981,"run 6: same as run 5 (v2); log transforms for amount features: INCOME, CREDIT, GOODS_PRICE, ANNUITY",heldout_test
+2026-07-26_12-04-10,v3,balanced,platt,0.75213,0.234893,0.372845,0.081981,"run 6: same as run 5 (v2); log transforms for amount features: INCOME, CREDIT, GOODS_PRICE, ANNUITY",heldout_test
+2026-07-26_12-12-27,v3,balanced,platt,0.75213,0.234893,0.372845,0.081981,"run 6: same as run 5 (v2); log transforms for amount features: INCOME, CREDIT, GOODS_PRICE, ANNUITY",heldout_test
+2026-07-26_16-09-18,v3,balanced,platt,0.75213,0.234893,0.372845,0.081981,"run 6: same as run 5 (v2); log transforms for amount features: INCOME, CREDIT, GOODS_PRICE, ANNUITY",heldout_test
