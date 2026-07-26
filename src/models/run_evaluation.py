@@ -5,7 +5,6 @@ from config import RunConfig
 from pathlib import Path
 import datetime as dt
 import time
-import csv
 
 from src.models.metrics import ks_statistic
 
@@ -26,6 +25,7 @@ from src.models.pipeline import (
     train,
     persist,
 )
+from src.models.tracking import log_run
 from src.features.feature_engineering import add_application_features
 from src.features.preprocessing import identify_feature_types
 
@@ -105,28 +105,12 @@ def main() -> None:
         top_k=40,
     )
 
-    # Write experiment record
-    exp_path = Path("results/experiments.csv")
-    exp_path.parent.mkdir(parents=True, exist_ok=True)
-    write_header = not exp_path.exists()
-
-    with open(exp_path, mode="a", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=[
-            "run_id", "version", "class_weight", "calibration", "auc", "pr_auc", "ks", "ks_thresh", "notes"
-        ])
-        if write_header:
-            writer.writeheader() # write header only if file is new
-        writer.writerow({
-            "run_id": run_id,
-            "version": cfg.version,
-            "class_weight": cfg.class_weight,
-            "calibration": cfg.calibration,
-            "auc": round(auc, 6),
-            "pr_auc": round(pr_auc, 6),
-            "ks": round(ks, 6),
-            "ks_thresh": round(ks_thresh, 6),
-            "notes": cfg.notes,
-        })
+    # Log this runs metadata
+    metrics = {
+        "test": {"auc": auc, "pr_auc": pr_auc, "ks": ks, "ks_thresh": ks_thresh},
+        "cv": results,      # the run_cv dict
+    }
+    log_run(paths.root, run_id, cfg, metrics)
     
     print(f"Run {run_id} complete. Saved evaluation artifacts to {paths.root.resolve()}")
     print(f"AUC: {auc:.6f} | PR-AUC: {pr_auc:.6f} | KS: {ks:.6f} | KS_THRESH: {ks_thresh:.6f}")
@@ -135,5 +119,6 @@ def main() -> None:
     execution_time = end_time - start_time
 
     print(f"Script executed in {execution_time:.2f} seconds")
+    
 if __name__ == "__main__":
     main()

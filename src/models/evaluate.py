@@ -56,10 +56,10 @@ def run_cv(model: Pipeline,
     cv = cross_validate(estimator=model, X=X_train, y=y_train, cv=skf, scoring=scoring)
 
     return {
-        "roc_auc_mean": cv["test_roc_auc"].mean(),
-        "roc_auc_std":  cv["test_roc_auc"].std(),
-        "pr_auc_mean":  cv["test_average_precision"].mean(),
-        "pr_auc_std":   cv["test_average_precision"].std(),
+        "roc_auc_mean": float(cv["test_roc_auc"].mean()),
+        "roc_auc_std":  float(cv["test_roc_auc"].std()),
+        "pr_auc_mean":  float(cv["test_average_precision"].mean()),
+        "pr_auc_std":   float(cv["test_average_precision"].std()),
     }
     
 # Plot ROC curve
