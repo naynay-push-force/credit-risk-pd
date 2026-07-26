@@ -9,7 +9,7 @@ Design principle:
   (b) domain logic (i.e., leverage / affordability ratios).
 
 Evidence references:
-- notebooks/01_eda_application.ipynb
+- notebooks/01_eda_application_train.ipynb
   - EXT_SOURCE_* show strong monotonic risk separation; missingness increases bad rate.
   - Ratio features (credit/income, annuity/income, goods/credit) show clearer monotonic patterns than raw amounts.
   - DAYS_BIRTH and DAYS_EMPLOYED become more interpretable as YEARS_* and show monotone trends with default risk.

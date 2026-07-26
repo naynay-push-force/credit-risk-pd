@@ -45,7 +45,7 @@ def score_applicant(
 
 def main() -> None:
     """Demo: score the first row of the training data and print its PD/decision."""
-    ROOT = Path(__file__).resolve().parent.parent.parent
+    ROOT = Path(__file__).resolve().parent.parent  # repo root (src/ -> ..)
     df = pd.read_csv(ROOT / "data" / "raw" / "application_train.csv")
     features = df.iloc[0].to_dict()
 

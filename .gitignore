@@ -31,3 +31,6 @@ data/interim/
 *.log
 outputs/
 reports/
+
+# --- Personal reflection / learning notes (kept local, not part of the repo) ---
+reflections/

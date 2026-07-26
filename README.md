@@ -57,27 +57,31 @@ Full evaluation: docs/model_card.md
 
 ```
 src/
+    run_evaluation.py            # entry point: orchestrates a training + evaluation run
+    score.py                     # single-applicant PD scoring from the saved model
+    tracking.py                  # experiment tracking (run.json records + comparison view)
     features/
         feature_engineering.py   # domain-justified feature transforms
-        preprocessing.py         # leakage-safe preprocessing pipeline
+        preprocessing.py         # leakage-safe preprocessing (ColumnTransformer)
     models/
-        baseline.py              # logistic regression pipeline
-        evaluate.py              # evaluation functions
+        baseline.py              # logistic regression pipeline definition
+        pipeline.py              # training steps: load / split / build / train / persist
+    evaluation/
+        evaluate.py              # curves, tables, calibration, CV
         metrics.py               # KS statistic
-        run_evaluation.py        # produces report artifacts
-        train_baseline.py        # training entry point
-    config.py                    # feature version and experiment config
+
+config.py                        # RunConfig dataclass (experiment control surface)
 
 notebooks/
     01_eda_application_train.ipynb
-    02_baseline_evaluation.ipynb
     03_threshold_analysis.ipynb
 
 docs/
-    model_card.md                # full experiment record and findings
+    model_card.md                # model card: findings and limitations
 
+reports/                         # per-run artifacts: figures, tables, model.joblib, run.json (gitignored)
 results/
-    experiments.csv              # tracked experiment log
+    experiments.csv              # frozen legacy run log (superseded by reports/*/run.json)
 ```
 
 ---

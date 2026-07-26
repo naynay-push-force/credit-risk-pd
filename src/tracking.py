@@ -85,7 +85,7 @@ def load_runs(reports_dir: Path = Path("reports")) -> pd.DataFrame:
 
 
 def main() -> None:
-    """Print a compact cross-run comparison table (`python -m src.models.tracking`)."""
+    """Print a compact cross-run comparison table (`python -m src.tracking`)."""
     df = load_runs()
     cols = ["run_id", "git_sha", "git_dirty",
             "metrics.test.auc", "metrics.cv.roc_auc_mean",

@@ -1,4 +1,4 @@
-# python -m src.models.run_evaluation
+# python -m src.run_evaluation
 
 from config import RunConfig
 
@@ -6,9 +6,9 @@ from pathlib import Path
 import datetime as dt
 import time
 
-from src.models.metrics import ks_statistic
+from src.evaluation.metrics import ks_statistic
 
-from src.models.evaluate import (
+from src.evaluation.evaluate import (
     EvalPaths,
     run_cv,
     plot_roc,
@@ -25,7 +25,7 @@ from src.models.pipeline import (
     train,
     persist,
 )
-from src.models.tracking import log_run
+from src.tracking import log_run
 from src.features.feature_engineering import add_application_features
 from src.features.preprocessing import identify_feature_types
 
@@ -41,7 +41,7 @@ def main() -> None:
     paths = EvalPaths(Path(f"reports/{run_id}_{cfg.version}"))
     paths.ensure()
 
-    ROOT = Path(__file__).resolve().parent.parent.parent
+    ROOT = Path(__file__).resolve().parent.parent  # repo root (src/ -> ..)
     data_path = ROOT / "data" / "raw" / "application_train.csv"
     df = load_data(data_path)
 
