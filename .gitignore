@@ -8,6 +8,7 @@ __pycache__/
 *.pyd
 *.pyo
 *.pkl
+*.joblib
 
 # --- Jupyter ---
 .ipynb_checkpoints/

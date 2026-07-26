@@ -1,0 +1,8 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+  "python.terminal.activateEnvironment": true,
+  "jupyter.askForKernelRestart": false,
+  "jupyter.kernels.filter": [],
+  "jupyter.notebookFileRoot": "${workspaceFolder}",
+  "python-envs.defaultEnvManager": "ms-python.python:system"
+}
